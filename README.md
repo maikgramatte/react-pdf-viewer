@@ -1,3 +1,10 @@
+# ASP related changes on v2.4.0
+- PDF will not await loading
+- MUI Tooltip
+- Other smaller changes.
+
+Whenever we need to modify the core of the PDF viewer we can install it, make changes and build. Later to copy over `packages/core/lib/cjs/core.js` to UCV src directory.
+
 # React PDF viewer
 A React component to view a PDF document.
 It's written in TypeScript, and powered by React hooks completely.

@@ -1,25 +1,5 @@
 # CHANGELOG
 
-## v2.4.2 [WIP]
-
-**Improvements**
-
-Support shortcuts.
-
-| Shortcut                      | Supported plugin                                      | Action                |
-|-------------------------------|-------------------------------------------------------|-----------------------|
-| <kbd>cmd</kbd> + <kbd>p</kbd> | [Print](https://react-pdf-viewer.dev/plugins/print/)  | Print the document    |
-| <kbd>cmd</kbd> + <kbd>-</kbd> | [Zoom](https://react-pdf-viewer.dev/plugins/zoom/)    | Zoom out the document |
-| <kbd>cmd</kbd> + <kbd>+</kbd> |                                                       | Zoom in the document  |
-| <kbd>cmd</kbd> + <kbd>0</kbd> |                                                       | Reset zoom to 100%    |
-
-## v2.4.1
-
-**Bug fixes**
-- Clicking the Download button doesn't work. It only works the file when scrolling to the second page
-- Using the Default Layout plugin, we can't scroll between pages on Safari 14
-- The Open file button covers other elements, so we can't click on the Download or Print buttons. This issue only happens on Safari 14
-
 ## v2.4.0
 
 **New features**

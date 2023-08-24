@@ -103,7 +103,7 @@ const DocumentLoader: React.FC<DocumentLoaderProps> = ({ characterMap, file, htt
     // (numOfPercentages does not reach 100 yet)
     // So, we have to check both `percentages` and `loaded`
     React.useEffect(() => {
-        (percentages === 100 && loadedDocument)
+        (percentages > 1 && loadedDocument)
             ? isMounted.current && setStatus(new CompletedState(loadedDocument))
             : isMounted.current && setStatus(new LoadingState(percentages));
     }, [percentages, loadedDocument]);

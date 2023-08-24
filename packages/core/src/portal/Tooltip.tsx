@@ -7,14 +7,39 @@
  */
 
 import * as React from 'react';
+import MuiTooltip, { TooltipProps as TooltipPropsMui, tooltipClasses  } from '@mui/material/Tooltip';
 
-import { Toggle, ToggleStatus } from '../hooks/useToggle';
+import { styled } from '@mui/material/styles';
 import Offset from './Offset';
-import Portal from './Portal';
 import Position from './Position';
-import TooltipBody from './TooltipBody';
+
+const ThemedMuiTooltip = styled(({ className, ...props }: TooltipPropsMui) => (
+    <MuiTooltip {...props} classes={{ popper: className }} />
+  ))(({ theme }) => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: theme.palette.common.black,
+        color: '#fff',
+        fontSize: 14,
+    },
+    [`& .${tooltipClasses.arrow}`]: {
+        color: theme.palette.common.black,
+    },
+  }));
 
 type RenderTooltipContent = () => React.ReactNode;
+
+type MuiPos = 'bottom-end'
+| 'bottom-start'
+| 'bottom'
+| 'left-end'
+| 'left-start'
+| 'left'
+| 'right-end'
+| 'right-start'
+| 'right'
+| 'top-end'
+| 'top-start'
+| 'top';
 
 interface TooltipProps {
     content: RenderTooltipContent;
@@ -25,36 +50,33 @@ interface TooltipProps {
 
 const Tooltip: React.FC<TooltipProps> = ({ content, offset, position, target }) => {
     const targetRef = React.createRef<HTMLDivElement>();
+    const targetLabel = React.createRef<HTMLSpanElement>();
 
-    const renderTarget = (toggle: Toggle): React.ReactElement => {
-        const show = (): void => { toggle(ToggleStatus.Open); };
-        const hide = (): void => { toggle(ToggleStatus.Close); };
-        return (
-            <div
-                ref={targetRef}
-                onMouseEnter={show}
-                onMouseLeave={hide}
-            >
-                {target}
-            </div>
-        );
-    };
+    React.useEffect(() => {
+        try {
+            targetRef.current.querySelector('button').setAttribute('aria-label', targetLabel.current.innerText);
+        } catch (error) {
+            // ok.
+        }
+    }, []);
 
-    const renderContent = (): React.ReactElement => (
-        <TooltipBody
-            offset={offset}
-            position={position}
-            targetRef={targetRef}
-        >
-            {content()}
-        </TooltipBody>
-    );
+    const muiPosition = React.useMemo<MuiPos>(() => {
+        return position.replace('_', '-')
+                .toLowerCase()
+                .replace('-center', '').
+                replace('-left', "-start").
+                replace('-right', '-end') as MuiPos;
+    }, [position]);
 
     return (
-        <Portal
-            target={renderTarget}
-            content={renderContent}
-        />
+        <ThemedMuiTooltip arrow placement={muiPosition} title={<>{content()}</>}>
+            <div
+                ref={targetRef}
+            >
+                {target}
+                <span ref={targetLabel} className="label" style={{ display: 'none' }}>{content()}</span>
+            </div>
+        </ThemedMuiTooltip>
     );
 };
 
