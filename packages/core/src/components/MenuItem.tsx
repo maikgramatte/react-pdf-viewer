@@ -8,8 +8,9 @@
 
 import * as React from 'react';
 
+import MuiMenuItem from '@mui/material/MenuItem';
 import CheckIcon from '../icons/CheckIcon';
-import ThemeContext from '../theme/ThemeContext';
+import { ListItemIcon, Typography, ListItemText } from '@mui/material';
 
 interface MenuItemProps {
     checked?: boolean;
@@ -18,20 +19,20 @@ interface MenuItemProps {
 }
 
 const MenuItem: React.FC<MenuItemProps> = ({ checked = false, children, icon = null, onClick }) => {
-    const theme = React.useContext(ThemeContext);
-
     return (
-        <li className={`${theme.prefixClass}-menu-item`} onClick={onClick}>
-            <div className={`${theme.prefixClass}-menu-item-icon`}>
+        <MuiMenuItem onClick={onClick} aria-selected={checked}>
+            <ListItemIcon>
                 {icon}
-            </div>
-            <div className={`${theme.prefixClass}-menu-item-label`}>
+            </ListItemIcon>
+            <ListItemText>
                 {children}
-            </div>
-            <div className={`${theme.prefixClass}-menu-item-check`}>
-                {checked && <CheckIcon />}
-            </div>
-        </li>
+            </ListItemText>
+            {checked &&
+                <Typography variant="body2">
+                    <CheckIcon />
+                </Typography>
+            }
+        </MuiMenuItem>
     );
 };
 

@@ -7,15 +7,25 @@
  */
 
 import * as React from 'react';
-import { LocalizationContext, LocalizationMap, Menu, MenuDivider, MenuItem, Popover, Position, SpecialZoomLevel, Toggle } from '@react-pdf-viewer/core';
-
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Divider from '@mui/material/Divider';
+import { LocalizationContext, LocalizationMap, SpecialZoomLevel } from '@react-pdf-viewer/core';
 import { RenderZoomProps } from './Zoom';
 
 const LEVELS = [0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4];
-const PORTAL_OFFSET = { left: 0, top: 8 };
 
 const ZoomPopover: React.FC<RenderZoomProps> = ({ scale, onZoom }) => {
     const l10n = React.useContext(LocalizationContext);
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
 
     const getSpcialLevelLabel = (level: SpecialZoomLevel): string | LocalizationMap => {
         switch (level) {
@@ -28,52 +38,55 @@ const ZoomPopover: React.FC<RenderZoomProps> = ({ scale, onZoom }) => {
         }
     };
 
-    const renderTarget = (toggle: Toggle): React.ReactElement => {
-        const click = (): void => { toggle(); };
-        return (
-            <span className='rpv-zoom-popover-target' onClick={click} role="button" aria-label="Apply zoom">
+    return (
+        <>
+            <button 
+                className='rpv-core-button rpv-zoom-popover-target' 
+                onClick={handleClick} 
+                tabIndex={0}
+                aria-label="Apply zoom"
+                id="zoom-button"
+                aria-controls={open ? 'zoom-menu' : undefined}
+                aria-haspopup="true"
+                aria-expanded={open ? 'true' : undefined}
+            >
                 <span className='rpv-zoom-popover-target-scale'>{Math.round(scale * 100)}%</span>
                 <span className='rpv-zoom-popover-target-arrow' />
-            </span>
-        );
-    };
-
-    const renderContent = (toggle: Toggle): React.ReactElement => (
-        <Menu>
-            {
-                Object.keys(SpecialZoomLevel).map((k) => {
-                    const level = k as SpecialZoomLevel;
-                    const clickMenuItem = (): void => { toggle(); onZoom(level); };
-                    return (
-                        <MenuItem key={level} onClick={clickMenuItem}>
-                            {getSpcialLevelLabel(level)}
-                        </MenuItem>
-                    );
-                })
-            }
-            <MenuDivider />
-            {
-                LEVELS.map((level) => {
-                    const clickMenuItem = (): void => { toggle(); onZoom(level); };
-                    return (
-                        <MenuItem key={level} onClick={clickMenuItem}>
-                            {`${Math.round(level * 100)}%`}
-                        </MenuItem>
-                    );
-                })
-            }
-        </Menu>
-    );
-
-    return (
-        <Popover
-            position={Position.BottomCenter}
-            target={renderTarget}
-            content={renderContent}
-            offset={PORTAL_OFFSET}
-            closeOnClickOutside={true}
-            closeOnEscape={true}
-        />
+            </button>
+             <Menu
+                id="basic-menu"
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                dense
+                MenuListProps={{
+                    'aria-labelledby': 'zoom-button',
+                }}
+            >
+                {
+                    Object.keys(SpecialZoomLevel).map((k) => {
+                        const level = k as SpecialZoomLevel;
+                        const clickMenuItem = (): void => { handleClose(); onZoom(level); };
+                        return (
+                            <MenuItem key={level} onClick={clickMenuItem}>
+                                {getSpcialLevelLabel(level)}
+                            </MenuItem>
+                        );
+                    })
+                }
+                <Divider />
+                {
+                    LEVELS.map((level) => {
+                        const clickMenuItem = (): void => { handleClose(); onZoom(level); };
+                        return (
+                            <MenuItem key={level} onClick={clickMenuItem}>
+                                {`${Math.round(level * 100)}%`}
+                            </MenuItem>
+                        );
+                    })
+                }
+            </Menu>
+        </>
     );
 };
 

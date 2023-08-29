@@ -7,7 +7,10 @@
  */
 
 import * as React from 'react';
-import { Button, LocalizationContext, Menu, MenuDivider, Popover, Position, Toggle, Tooltip } from '@react-pdf-viewer/core';
+import Menu from '@mui/material/Menu';
+import Divider from '@mui/material/Divider';
+
+import { LocalizationContext } from '@react-pdf-viewer/core';
 import { ScrollMode } from '@react-pdf-viewer/scroll-mode';
 import { SelectionMode } from '@react-pdf-viewer/selection-mode';
 
@@ -18,58 +21,61 @@ interface MoreActionsPopoverProps {
     toolbarSlot: ToolbarSlot;
 }
 
-const PORTAL_OFFSET = { left: 0, top: 8 };
-
 const MoreActionsPopover: React.FC<MoreActionsPopoverProps> = ({ toolbarSlot }) => {
     const l10n = React.useContext(LocalizationContext);
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
+    const label = l10n && l10n.toolbar ? l10n.toolbar.moreActions : 'More actions';
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
     const {
         GoToFirstPageMenuItem, GoToLastPageMenuItem, RotateBackwardMenuItem, RotateForwardMenuItem, ShowPropertiesMenuItem,
         SwitchScrollModeMenuItem, SwitchSelectionModeMenuItem,
     } = toolbarSlot;
 
-    const renderTarget = (toggle: Toggle, opened: boolean): React.ReactElement => {
-        const label = l10n && l10n.toolbar ? l10n.toolbar.moreActions : 'More actions';
-
-        return (
-            <Tooltip
-                position={Position.BottomRight}
-                target={<Button onClick={toggle} isSelected={opened}><MoreIcon /></Button>}
-                content={() => label}
-                offset={PORTAL_OFFSET}
-            />
-        );
-    };
-
-    const renderContent = (toggle: Toggle): React.ReactElement => {
-        return (
-            <Menu>
-                <GoToFirstPageMenuItem onClick={toggle} />
-                <GoToLastPageMenuItem onClick={toggle} />
-                <MenuDivider />
-                <RotateForwardMenuItem onClick={toggle} />
-                <RotateBackwardMenuItem onClick={toggle} />
-                <MenuDivider />
-                <SwitchSelectionModeMenuItem mode={SelectionMode.Text} onClick={toggle} />
-                <SwitchSelectionModeMenuItem mode={SelectionMode.Hand} onClick={toggle} />
-                <MenuDivider />
-                <SwitchScrollModeMenuItem mode={ScrollMode.Vertical} onClick={toggle} />
-                <SwitchScrollModeMenuItem mode={ScrollMode.Horizontal} onClick={toggle} />
-                <SwitchScrollModeMenuItem mode={ScrollMode.Wrapped} onClick={toggle} />
-                <MenuDivider />
-                <ShowPropertiesMenuItem onClick={toggle} />
-            </Menu>
-        );
-    };
-
     return (
-        <Popover
-            position={Position.BottomRight}
-            target={renderTarget}
-            content={renderContent}
-            offset={PORTAL_OFFSET}
-            closeOnClickOutside={true}
-            closeOnEscape={true}
-        />
+        <>
+            <button 
+                id="more-button" 
+                onClick={handleClick} 
+                className={`rpv-core-button ${open ? 'rpv-core-button-selected' : ''}`}
+                aria-label={label}
+                aria-controls={open ? 'more-menu' : undefined}
+                aria-haspopup="true"
+                aria-expanded={open ? 'true' : undefined}
+            >
+                <MoreIcon />
+            </button>
+            <Menu
+                id="more-menu"
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                MenuListProps={{
+                    'aria-labelledby': 'more-button',
+                }}
+            >
+                <GoToFirstPageMenuItem onClick={handleClose} />
+                <GoToLastPageMenuItem onClick={handleClose} />
+                <Divider />
+                <RotateForwardMenuItem onClick={handleClose} />
+                <RotateBackwardMenuItem onClick={handleClose} />
+                <Divider />
+                <SwitchSelectionModeMenuItem mode={SelectionMode.Text} onClick={handleClose} />
+                <SwitchSelectionModeMenuItem mode={SelectionMode.Hand} onClick={handleClose} />
+                <Divider />
+                <SwitchScrollModeMenuItem mode={ScrollMode.Vertical} onClick={handleClose} />
+                <SwitchScrollModeMenuItem mode={ScrollMode.Horizontal} onClick={handleClose} />
+                <SwitchScrollModeMenuItem mode={ScrollMode.Wrapped} onClick={handleClose} />
+                <Divider />
+                <ShowPropertiesMenuItem onClick={handleClose} />
+            </Menu>
+        </>
     );
 };
 
